@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import mime from 'mime';
 import logger from './logger.js';
-import chatServer from './lib/chatServer.js';
+import createChatServer from './lib/createChatServer.js';
 
 
 let cache = {};
@@ -64,7 +64,9 @@ server.listen(3865, () => {
     logger("Main Server took control over the PORT! And it's working now ^_^");
 })
 
-chatServer(server);
+const chatServer = new createChatServer(server);
+
+chatServer.listen();
 
 setInterval(() => {
     logger("Cache Status: ", Object.keys(cache).length, " files");
