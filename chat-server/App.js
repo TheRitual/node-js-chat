@@ -3,9 +3,11 @@ import fs from 'fs';
 import path from 'path';
 import mime from 'mime';
 import logger from './logger.js';
+import chatServer from './lib/chatServer.js';
+
 
 let cache = {};
-const displayCacheInterval = 60000; //milliseconds
+const displayCacheInterval = 600000; //milliseconds
 
 const send404 = (response) => {
     logger("Displaying Error 404");
@@ -61,6 +63,8 @@ const server = http.createServer((request, response) => {
 server.listen(3865, () => {
     logger("Main Server took control over the PORT! And it's working now ^_^");
 })
+
+chatServer(server);
 
 setInterval(() => {
     logger("Cache Status: ", Object.keys(cache).length, " files");
