@@ -1,0 +1,55 @@
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import mime from 'mime';
+
+let cache = {};
+
+const send404 = (response) => {
+    response.writeHead(404, { 'content-type': 'text/plain' });
+    response.write(`Error 404 : Whoopsy! I can't find droid... I mean... files... you are looking for`)
+    response.end();
+}
+
+const sendFile = (response, filePath, fileContents) => {
+    response.writeHead(200, { "content-type": mime.lookup(path.basename(filePath)) });
+    response.end(fileContents);
+}
+
+const serveStatic = (response, cache, absPath) => {
+    if (cache[absPath]) {
+        sendFile(response, absPath, cache[absPath]);
+    } else {
+        fs.access(absPath, fs.constants.R_OK, (error) => {
+            if (error) {
+                console.log("Can't access/find file from path: " + absPath);
+                send404(response);
+            } else {
+                fs.readFile(absPath, (err, data) => {
+                    if (err) {
+                        console.log("Can't read file from path: " + absPath);
+                        send404(response);
+                    } else {
+                        cache = { ...cache, data };
+                        sendFile(response, absPath, data);
+                    }
+                });
+            }
+        });
+    }
+}
+
+const server = http.createServer((request, response) => {
+    let filePath = false;
+    if (request.url === '/') {
+        filePath = 'public/index.html';
+    } else {
+        filePath = 'public' + request.url;
+    }
+    const absPath = './' + filePath;
+    serveStatic(response, cache, absPath);
+});
+
+server.listen(3865, () => {
+    console.log("Main Server took control over the PORT! And it's working now ^_^");
+})
