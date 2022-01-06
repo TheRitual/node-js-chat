@@ -6,6 +6,7 @@
   "repository": "https://github.com/TheRitual/node-js-chat",
   "author": "Marcin (MGIK) Kawczyński",
   "license": "MIT",
+  "type": "module",
   "dependencies": {
     "mime": "^3.0.0",
     "socket.io": "^4.4.1"
