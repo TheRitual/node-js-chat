@@ -19,7 +19,7 @@ const App = () => {
   }, []);
 
   socket && socket.on('message', (message) => {
-    logger(message.text);
+    logger(message);
   });
   return (
     <div>

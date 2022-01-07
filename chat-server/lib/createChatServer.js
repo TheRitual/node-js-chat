@@ -62,7 +62,8 @@ class createChatServer {
                         name: name,
                     });
                     socket.broadcast.to(this.currentRoom[socket.id]).emit('message', {
-                        text: previousName + ' is now ' + name + '.'
+                        text: previousName + ' is now ' + name + '.',
+                        level: 'server'
                     });
                 } else {
                     socket.emit('nameResult', {
