@@ -17,8 +17,8 @@ class createChatServer {
     }
 
     assignGuestName = (socket, guestNumber, nickNames, namesUsed) => {
-        logger("Assigning Guest Name");
         const guestName = this.defaultName + guestNumber;
+        logger("Assigning Guest Name: " + guestName);
         nickNames[socket.id] = guestName;
         socket.emit('nameResult', {
             success: true,
@@ -34,7 +34,7 @@ class createChatServer {
         socket.emit('joinResult', {
             room: room
         });
-        const usersInRoom = io.sockets.clients(room);
+        const usersInRoom = room.length;
         const message = usersInRoom.length > 1 ?
             this.nickNames[socket.id] + " is now having great time in room " + room + " with you! Enjoy!" :
             this.nickNames[socket.id] + " is first person in room " + room + ". Wait for others to join, or have a great monologue. ;)";
@@ -79,6 +79,7 @@ class createChatServer {
             socket.broadcast.to(message.room).emit('message'), {
                 text: this.nickNames[socket.id] + ":" + message.text,
             };
+            logger(this.nickNames[socket.id] + " @ " + message.room + " ::: " + message.text);
         });
     };
 
@@ -99,17 +100,24 @@ class createChatServer {
 
     listen = () => {
         logger("Running Socket.IO");
-        this.io = new Server(this.server);
+        this.io = new Server(this.server, {
+            cors: {
+                origin: "http://localhost:3000",
+                methods: ["GET", "POST"],
+                credentials: true,
+            }
+        });
         this.io.sockets.on('connection', (socket) => {
-            this.guestNumber = assignGuestName(socket, this.guestNumber, this.nickNames, this.namesUsed);
-            joinRoom(socket, 'Lobby');
-            handleMessageBroadcasting(socket, this.nickNames);
-            handleNameChangeAttempts(socket, this.nickNames, this.namesUsed);
-            handleRoomJoining(socket);
+            logger("New Socket Connection: ", socket.id);
+            this.guestNumber = this.assignGuestName(socket, this.guestNumber, this.nickNames, this.namesUsed);
+            this.joinRoom(socket, 'Lobby');
+            this.handleMessageBroadcasting(socket, this.nickNames);
+            this.handleNameChangeAttempts(socket, this.nickNames, this.namesUsed);
+            this.handleRoomJoining(socket);
             socket.on('rooms', () => {
                 socket.emit('rooms', this.io.sockets.manager.rooms);
             });
-            handleClientDisconnection(socket, this.nickNames, this.namesUsed);
+            this.handleClientDisconnection(socket, this.nickNames, this.namesUsed);
         });
     };
 

@@ -5,9 +5,9 @@ import mime from 'mime';
 import logger from './logger.js';
 import createChatServer from './lib/createChatServer.js';
 
-
 let cache = {};
 const displayCacheInterval = 600000; //milliseconds
+const port = 3865;
 
 const send404 = (response) => {
     logger("Displaying Error 404");
@@ -60,8 +60,9 @@ const server = http.createServer((request, response) => {
     serveStatic(response, cache, absPath);
 });
 
-server.listen(3865, () => {
-    logger("Main Server took control over the PORT! And it's working now ^_^");
+server.listen(port, () => {
+    logger("Main Server took control over the PORT! And it's working now on port " + port + " ^_^");
+    logger("Visit: http://127.0.0.7:" + port);
 })
 
 const chatServer = new createChatServer(server);
