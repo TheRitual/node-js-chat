@@ -103,9 +103,12 @@ class createChatServer {
         logger("Running Socket.IO");
         this.io = new Server(this.server, {
             cors: {
-                origin: "http://localhost:3000",
+                origin: ["localhost:*", "127.0.0.1:*"],
                 methods: ["GET", "POST"],
                 credentials: true,
+                extraHeaders: {
+                    "Access-Control-Allow-Origin": "*",
+                }
             }
         });
         this.io.sockets.on('connection', (socket) => {

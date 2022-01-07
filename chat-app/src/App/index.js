@@ -11,7 +11,8 @@ const App = () => {
 
   useEffect(() => {
     const mySocket = io('127.0.0.1:3865', {
-      withCredentials: true
+      withCredentials: true,
+      transports : ['websocket'],
     });
     const myChat = new Chat(mySocket);
     setSocket(mySocket);
